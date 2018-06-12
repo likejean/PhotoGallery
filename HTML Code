@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">    
+   <head>
+        <title>My Music List</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+        <link href="http://localhost:8082/Styling.css">
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta charset="UTF-8">
+        <style> 
+        img {
+            border: 5px solid #ddd;
+            border-radius: 25px;
+            padding: 25px;
+            width: 250px;
+        }
+        </style>  
+    </head>
+ 
+    <body>
+        <div class = "input">            
+            <form class = "w3-container">
+                <input class ="w3-input w3-animate-input" id = "photo name" type = "text" name = "Photo Name" value="Insert Photo Name" style = "width: 250px"><br>
+                <input class ="w3-input w3-animate-input" id = "file" type = "text" name = "filename" style = "width: 250px"><br>
+            </form>
+        </div>
+        <div class = "button">
+            <button class = "w3-button w3-white" id = "onload" onclick = "readSingleFile(e)">Onload</button></br></br>        
+            <button class = "w3-button w3-teal" id = "add" onclick = "Addition()">Add</button><br><br>
+            <button class = "w3-button w3-red" id = "remove" onclick = "Removal()">Remove</button> 
+        </div> 
+        <div class="image">
+            <div>                           
+                <button class="w3-button w3-light-grey" id = "prev" onclick = "Previous()">Previous &laquo;</button>
+            </div>
+            <div>
+                <h2></h2>
+                <p></p>            
+                <img id = "img" src = "" class = "rounded" alt="Honda EX">
+            </div><br>
+            <div>
+                <button class="w3-button w3-green" id = "next" onclick="Next()">Next &raquo;</button>
+            </div>                       
+        </div>      
+    </body>
+</html>
+
+
+<script type="text/javascript">    
+    
+    function Addition(){
+        let a = document.getElementById("add");
+        let event = List.enqueue(document.getElementById("photo name").value); 
+        a.addEventListener("click", event, false);
+        
+    }    
+
+    function Removal(){
+        document.getElementById("remove").addEventListener("click", List.dequeue());
+        console.log(List);
+    }
+
+    
+    
+    function Previous(){
+        let a = document.getElementById("prev");                   
+        let event = List.forward();        
+        a.addEventListener("click", event, false);
+    }   
+
+        
+    function Next(){
+        let a = document.getElementById("next");                   
+        let event = List.backward();        
+        a.addEventListener("click", event, false);
+    }       
+    
+
+    function DLNode(value){
+        this.value = value;
+        this.index = null;       
+        this.next = null;
+        this.prev = null;
+        this.visible = null;
+    };
+
+    function DLQueue(){
+        this.head = null; //front of the list - add property parameter
+        this.tail = null; //back of the list - add property parameter;\
+        this._size = 0;        
+    };   
+
+    DLQueue.prototype.IsEmpty = function(){
+        if (!this.head || !this.tail){
+            return true;
+        }
+        return false;
+    };
+
+    DLQueue.prototype.dequeue = function(){
+        let temp = this.tail;
+        if (List.IsEmpty()){
+            throw "The List is Empty!";
+            return false;
+        }        
+        else if(this.head == this.tail){
+            this.head = null;
+            this.tail = null;
+            this._size--;
+            document.getElementById("img").src = "";
+            document.getElementsByTagName("H2")[0].innerHTML = "No Photos Left";            
+        }
+        else if(this._size == 2){
+            this.head.next = this.tail;
+            this.tail.prev = this.head;
+            this._size--;            
+        }   
+        else{            
+            this.tail = temp.prev; 
+            temp.prev = null;
+            this.tail.next = this.head;
+            this.head.prev = this.tail; 
+            
+            this._size--;
+        }
+        return this;
+    }; 
+
+    DLQueue.prototype.enqueue = function(val){        
+        let NewNode = new DLNode(val);        
+        if(List.IsEmpty()){
+            this.tail = NewNode;
+            this.head = NewNode;
+            this.visible = NewNode;
+            this._size++;
+            this.head.index = this._size;
+            document.getElementById("img").src = val;
+            document.getElementsByTagName("H2")[0].innerHTML = "Photo #" + this.head.index;            
+            return NewNode;
+        }       
+        else if (this._size == 1) {
+            let temp = this.head;
+            this.head = NewNode;
+            this.visible = NewNode;
+            NewNode.next = temp;
+            temp.prev = NewNode;
+            this._size++;
+            NewNode.index = this._size;
+            document.getElementById("img").src = val;
+            document.getElementsByTagName("H2")[0].innerHTML = "Photo #" + NewNode.index;                      
+        }
+        else {
+            let temp = this.head;
+            this.head = NewNode;
+            this.visible = NewNode;
+            NewNode.next = temp;
+            temp.prev = NewNode;
+            this.head.prev = this.tail;
+            this.tail.next = this.head;
+            this._size++;
+            NewNode.index = this._size;
+            document.getElementById("img").src = val;
+            document.getElementsByTagName("H2")[0].innerHTML = "Photo #" + NewNode.index;                      
+        }              
+        return NewNode;        
+    };     
+
+
+    DLQueue.prototype.forward = function(){        
+        if (this._size == 0){
+            throw "This list is empty!!!"
+            return false;
+        }
+        else if (this._size == 1){
+            throw "There is only one picture!"
+            return false;
+        }
+        else {                        
+            List.fwd_runner(this.visible);            
+        }       
+    };
+
+    DLQueue.prototype.fwd_runner = function(curr){
+        curr = curr.next;
+        this.visible = curr;
+        console.log(this.visible);
+        document.getElementById("img").src = curr.value;
+        document.getElementsByTagName("H2")[0].innerHTML = "Photo #" + curr.index; 
+        return curr;      
+    }
+
+    DLQueue.prototype.backward = function(){        
+        if (this._size == 0){
+            throw "This list is empty!!!"
+            return false;
+        }
+        else if (this._size == 1){
+            throw "There is only one picture!"
+            return false;
+        }
+        else {                        
+            List.bck_runner(this.visible);            
+        }       
+    };
+
+    DLQueue.prototype.bck_runner = function(curr){
+        curr = curr.prev;
+        this.visible = curr;
+        console.log(this.visible);
+        document.getElementById("img").src = curr.value;
+        document.getElementsByTagName("H2")[0].innerHTML = "Photo #" + curr.index; 
+        return curr;      
+    }
+
+
+
+    var List = new DLQueue();    
+</script>
