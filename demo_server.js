@@ -30,7 +30,7 @@ http.createServer(function(request, response) {
 		sendFileContent(response, request.url.toString().substring(1), "text/javascript");
 	}  
 
-    //otherwise, if http://localhost:3000/index.html is not in use, have some default content...
+    //otherwise, if http://localhost:3000/QUEUE.html is not in use, have some default content...
     else{
         response.writeHead(200, {'Content-Type': 'text/html'});
         response.write('<b>Hey there!</b><br /><br />This is the default response. Requested URL is: ' + request.url);
